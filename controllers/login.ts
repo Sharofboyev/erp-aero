@@ -16,19 +16,15 @@ export async function logout(req: Request, res: Response) {
 }
 
 export async function signIn(req: Request, res: Response) {
-  let result = validateLogin(req.body);
+  const result = validateLogin(req.body);
   if (!result.ok) return res.status(400).send(result.message);
   let { success, message } = await userService.signIn(
     result.value.id,
     result.value.password
   );
   if (success) {
-    let accessToken = jwt.sign({ id: result.value.id }, config.secretKey, {
-      expiresIn: config.tokenLife
-    });
-    let refreshToken = jwt.sign({}, config.refreshTokenSecretKey, {
-      expiresIn: config.refreshTokenLife
-    });
+    const accessToken = userService.generateToken({id: result.value.id}, config.secretKey, config.tokenLife);
+    const refreshToken = userService.generateToken({id: result.value.id}, config.refreshTokenSecretKey, config.refreshTokenLife);
     return res.setHeader("accessToken", accessToken).send({ refreshToken });
   }
   return res.status(400).send(message);
@@ -45,5 +41,6 @@ export async function signUp(req: Request, res: Response) {
 }
 
 export async function refreshToken(req: Request, res: Response) {
-  res.send("Token: 123456ABCDEF");
+    const token = userService.generateToken({id: ((req as CustomRequest) as JwtPayload).id}, config.secretKey, config.tokenLife)
+    return res.setHeader("accessToken", token).send("Success");
 }

@@ -8,7 +8,7 @@ export interface CustomRequest extends Request {
     user: string | JwtPayload;
 }
 
-async function auth(req: Request, res: Response, next: NextFunction) {
+export async function auth(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization;
   try {
     if (!token) throw new Error("Token not provided");
@@ -26,4 +26,20 @@ async function auth(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export default auth;
+export async function authRefreshToken(req: Request, res: Response, next: NextFunction) {
+  let token = req.headers.refreshtoken
+  try {
+    if (!token) throw new Error("Token not provided");
+    token = String(token);
+    let user = jwt.verify(token, config.refreshTokenSecretKey);
+    let blocked = !(await userInstance.checkToken(token));
+    if (blocked) {
+      throw new Error("Already logged out");
+    }
+    if (user)
+      (req as CustomRequest).user = user;
+    return next();
+  } catch (err) {
+    return res.status(401).send(`Unauthorized. ${(err as Error).message}`);
+  }
+}

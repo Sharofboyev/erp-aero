@@ -32,12 +32,12 @@ class User {
   async refreshToken() {}
   async signUp(password: string) {
     try {
-        let hash = bcrypt.hashSync(password, 10);
+      let hash = bcrypt.hashSync(password, 10);
       let userId = await insertUser(hash);
       let accessToken = jwt.sign({ id: userId }, config.secretKey, {
         expiresIn: config.tokenLife
       });
-      let refreshToken = jwt.sign({}, config.refreshTokenSecretKey, {
+      let refreshToken = jwt.sign({id: userId}, config.refreshTokenSecretKey, {
         expiresIn: config.refreshTokenLife
       });
       return { success: true, data: { userId, refreshToken, accessToken } };
@@ -46,12 +46,19 @@ class User {
     }
   }
 
+  generateToken(data: any, secretKey: string, expiresIn: number){
+    let accessToken = jwt.sign(data, secretKey, {
+        expiresIn: expiresIn
+    });
+    return accessToken
+  }
+
   async blockToken(token: string) {
     try {
       await addToBlackList(token);
       return { success: true };
     } catch (err) {
-        return { success: false, message: (err as Error).message };
+      return { success: false, message: (err as Error).message };
     }
   }
 
@@ -60,7 +67,7 @@ class User {
       await validateToken(token);
       return true;
     } catch (err) {
-      return false
+      return false;
     }
   }
 }
