@@ -9,3 +9,5 @@ router.get("/logout", auth, logout);
 router.post("/signin", signIn);
 router.post("/signin/new_token", auth, refreshToken);
 router.post("/signup", signUp);
+
+export default router;

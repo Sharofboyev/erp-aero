@@ -1,24 +1,75 @@
-import config from "../config"
+import config from "../config";
 import mysql from "mysql";
+const connection = mysql.createConnection(config.dbConfig);
+connection.query(`CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, password VARCHAR(1024))`)
+connection.query(`CREATE TABLE IF NOT EXISTS tokens (token VARCHAR(2096), expiration DATETIME)`)
 
+// This line will immediatly register signal handler. Only one
+//connection will serve to the app. Whenever app terminates, connection will be closed.
+process.on("SIGINT", () => {
+  process.exit();
+});
 
-export function getUser(id: Number){
-    const connection = mysql.createConnection(config.dbConfig);
+process.on("exit", () => {
+  connection.end();
+});
+
+export function getUser(id: Number) {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      "SELECT * FROM users WHERE id = ?",
+      [id],
+      (error, results) => {
+        if (error) reject(error);
+        if (results.length > 0) return resolve(results[0]);
+        reject(new Error("No user with given id"));
+      }
+    );
+  });
+}
+
+export function insertUser(password: string) {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      "INSERT INTO users (password) VALUES (?) ",
+      [password],
+      (error, results) => {
+        if (error) return reject(error);
+        return resolve(results.insertId);
+      }
+    );
+  });
+}
+
+export function addToken(token: string): Promise<void | string> {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      "INSERT INTO tokens (token) VALUES (?)",
+      [token],
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve();
+      }
+    );
+  });
+}
+
+export function validateToken(token: string): Promise<void> {
     return new Promise((resolve, reject) => {
-        connection.query("SELECT * FROM users WHERE id = ?", [id], (error, results) => {
-            connection.end();
-            if (error) reject(error);
-            if (results.length > 0) resolve(results[0])
-            reject("No user with given id");
-        })
-    })
-}
-
-export function insertUser(password: string, callback: Function){
-    const connection = mysql.createConnection(config.dbConfig);
-    connection.query("INSERT INTO users (password) VALUES (?) ", [password], (error, results) => {
-        connection.end()
-        if (error) throw error;
-        return callback(results.insertId);
-    })
-}
+      connection.query(
+        "SELECT COUNT(*) AS counter FROM tokens WHERE token = ?",
+        [token],
+        (error, result) => {
+          if (error) {
+            reject(error);
+          }
+          else if (result[0].counter > 0){
+            reject(new Error("This token is no more valid"));
+          }
+          resolve();
+        }
+      );
+    });
+  }
