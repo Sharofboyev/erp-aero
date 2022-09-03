@@ -13,7 +13,11 @@ export async function receiveFile(req: Request, res: Response){
 }
 
 export async function deleteFile(req: Request, res: Response){
-
+    const result = validateFile(req.params);
+    if (!result.ok) return res.status(400).send(result.message);
+    let {success, message} = await fileService.deleteFile(result.value.id);
+    if (success) return res.send("Success");
+    return res.status(500).send(message);
 }
 
 export async function getFiles(req: Request, res: Response){
@@ -31,7 +35,7 @@ export async function getFiles(req: Request, res: Response){
 export async function getFile(req: Request, res: Response){
     const result = validateFile(req.params);
     if (!result.ok) return res.status(400).send(result.message);
-    const {status, message, data} = await fileService.getFile(result.value.id);
+    const {status, message, data} = await fileService.getFileInfo(result.value.id);
     if (status === 200){
         return res.send(data);
     }

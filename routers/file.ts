@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/upload", fileValidator, upload.single("file"), receiveFile); //done
 router.get("/list", getFiles);  //done
 router.delete("/delete/:id", deleteFile);   
-router.get("/:id", getFile);   
+router.get("/:id", getFile);   //done
 router.get("/download/:id",);
 router.put("/update/:id",);
 

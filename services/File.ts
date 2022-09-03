@@ -1,4 +1,5 @@
-import { addFile, getFiles, getFile } from "../models/file";
+import { addFile, getFiles, getFile, deleteFile } from "../models/file";
+import fs from "fs"
 
 export type CustomFile = Express.Multer.File & {extension?: string};
 
@@ -16,9 +17,11 @@ export default class FileHandler{
         }
     }
 
-    async deleteFile(file: File){
+    async deleteFile(id: string){
         try {
-            
+            await deleteFile(id);
+            if (fs.existsSync(`files/${id}`))
+                fs.unlinkSync(`files/${id}`)
             return {success: true}
         }
         catch (err){
@@ -33,7 +36,7 @@ export default class FileHandler{
         return files;
     }
 
-    async getFile(id: string){
+    async getFileInfo(id: string){
         try {
             let files = await getFile(id);
             if (files.length === 0){
