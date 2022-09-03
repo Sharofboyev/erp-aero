@@ -27,11 +27,12 @@ export function insertUser(id: string, password: string) {
   });
 }
 
-export function addToken(token: string): Promise<void | string> {
+export function addToken(token: string, expiration: Date): Promise<void | string> {
   return new Promise((resolve, reject) => {
     connection.query(
-      "INSERT INTO tokens (token, expiration) VALUES (?, ?)",
-      [token],
+      `DELETE FROM tokens WHERE expiration < NOW();
+        INSERT INTO tokens (token, expiration) VALUES (?, ?)`,
+      [token, expiration],
       (error, result) => {
         if (error) {
           return reject(error);

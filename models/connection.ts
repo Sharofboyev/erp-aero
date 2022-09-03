@@ -1,6 +1,6 @@
 import config from "../config";
 import mysql from "mysql";
-const connection = mysql.createConnection(config.dbConfig);
+const connection = mysql.createConnection({...config.dbConfig, multipleStatements: true});
 console.log("Connection with database created...");
 
 connection.query(

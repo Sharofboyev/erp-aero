@@ -13,13 +13,12 @@ export async function giveID(req: Request, res: Response) {
 
 export async function logout(req: Request, res: Response) {
   try {
-    if (!req.headers.authorization || !req.headers.refreshtoken)
-      throw new Error("Unexpected error");
+    const token = req.headers.authorization;
+    const user: JwtPayload = (req as CustomRequest).user as JwtPayload;
     let result = await userService.blockToken(
-      req.headers.authorization as string
+      token as string,
+      user.exp ? user.exp : 0
     );
-    if (!result.success) throw new Error(result.message);
-    result = await userService.blockToken(req.headers.refreshtoken as string);
     if (!result.success) throw new Error(result.message);
     return res.send("Logged out successfully");
   } catch (err) {
@@ -43,7 +42,7 @@ export async function signIn(req: Request, res: Response) {
       config.tokenLife
     );
     const refreshToken = userService.generateToken(
-      {id: result.value.id},
+      { id: result.value.id },
       config.refreshTokenSecretKey,
       config.refreshTokenLife
     );
@@ -67,11 +66,13 @@ export async function refreshToken(req: Request, res: Response) {
   const result = validateRefreshToken(req.body);
   if (!result.ok) return res.status(400).send(result.message);
 
-  const {success, message, id} = await userService.refreshToken(result.value.refreshToken);
+  const { success, message, id } = await userService.refreshToken(
+    result.value.refreshToken
+  );
   if (!success) return res.status(400).send(message);
 
   const token = userService.generateToken(
-    {id},
+    { id },
     config.secretKey,
     config.tokenLife
   );

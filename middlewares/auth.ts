@@ -17,9 +17,10 @@ export async function auth(req: Request, res: Response, next: NextFunction) {
     let user = jwt.verify(token.substring(7), config.secretKey);
     let blocked = !(await userInstance.checkToken(token));
     if (blocked) {
-      throw new Error("Already logged out");
+      throw new Error("This token is no more valid");
     }
-    if (user) (req as CustomRequest).user = user;
+    if (user)
+      (req as CustomRequest).user = user;
     return next();
   } catch (err) {
     return res.status(401).send(`Unauthorized. ${(err as Error).message}`);

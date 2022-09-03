@@ -51,9 +51,9 @@ class User {
     return accessToken;
   }
 
-  async blockToken(token: string) {
+  async blockToken(token: string, expiration: number) {
     try {
-      await addToBlackList(token);
+      await addToBlackList(token, new Date(expiration * 1000));
       return { success: true };
     } catch (err) {
       return { success: false, message: (err as Error).message };
