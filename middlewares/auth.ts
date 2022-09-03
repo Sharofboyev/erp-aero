@@ -34,7 +34,7 @@ export async function authRefreshToken(req: Request, res: Response, next: NextFu
     let user = jwt.verify(token, config.refreshTokenSecretKey);
     let blocked = !(await userInstance.checkToken(token));
     if (blocked) {
-      throw new Error("Already logged out");
+      throw new Error("Invalid token");
     }
     if (user)
       (req as CustomRequest).user = user;

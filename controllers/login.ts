@@ -52,6 +52,7 @@ export async function signUp(req: Request, res: Response) {
 }
 
 export async function refreshToken(req: Request, res: Response) {
-    const token = userService.generateToken({id: ((req as CustomRequest) as JwtPayload).id}, config.secretKey, config.tokenLife)
-    return res.setHeader("accessToken", token).send("Success");
+  const user = (req as CustomRequest).user;
+  const token = userService.generateToken({id: (user as JwtPayload).id}, config.secretKey, config.tokenLife)
+  return res.setHeader("accessToken", token).send("Success");
 }

@@ -1,8 +1,13 @@
 import config from "../config";
 import mysql from "mysql";
 const connection = mysql.createConnection(config.dbConfig);
-connection.query(`CREATE TABLE IF NOT EXISTS users (id VARCHAR(1024), password VARCHAR(1024))`)
-connection.query(`CREATE TABLE IF NOT EXISTS tokens (token VARCHAR(2096), expiration DATETIME)`)
+connection.query(
+  `CREATE TABLE IF NOT EXISTS users 
+    (pkey SERIAL PRIMARY KEY, id VARCHAR(1024), password VARCHAR(1024), created_time DATETIME DEFAULT NOW());`
+);
+connection.query(
+  `CREATE TABLE IF NOT EXISTS tokens (token VARCHAR(2096), expiration DATETIME)`
+);
 
 // This line will immediatly register signal handler. Only one
 //connection will serve to the app. Whenever app terminates, connection will be closed.
@@ -57,19 +62,18 @@ export function addToken(token: string): Promise<void | string> {
 }
 
 export function validateToken(token: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        "SELECT COUNT(*) AS counter FROM tokens WHERE token = ?",
-        [token],
-        (error, result) => {
-          if (error) {
-            reject(error);
-          }
-          else if (result[0].counter > 0){
-            reject(new Error("This token is no more valid"));
-          }
-          resolve();
+  return new Promise((resolve, reject) => {
+    connection.query(
+      "SELECT COUNT(*) AS counter FROM tokens WHERE token = ?",
+      [token],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else if (result[0].counter > 0) {
+          reject(new Error("This token is no more valid"));
         }
-      );
-    });
-  }
+        resolve();
+      }
+    );
+  });
+}

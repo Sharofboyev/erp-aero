@@ -14,9 +14,9 @@ export function validateUser(
     id: Joi.alternatives(
       Joi.string().email().required(),
       Joi.string().regex(
-        /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
-      )
-    ),
+        /^(\+?\d{7,15})\b$/
+      ).required()
+    ).required(),
     password: Joi.string().min(5).required()
   }).validate(body);
   if (error) return validationError(error.details[0].message);
