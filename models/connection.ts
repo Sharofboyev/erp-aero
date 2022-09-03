@@ -1,7 +1,7 @@
 import config from "../config";
 import mysql from "mysql";
 const connection = mysql.createConnection(config.dbConfig);
-console.log("Connection with database created..."); 
+console.log("Connection with database created...");
 
 connection.query(
   `CREATE TABLE IF NOT EXISTS users 

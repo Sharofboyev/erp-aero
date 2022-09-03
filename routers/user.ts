@@ -1,6 +1,12 @@
 import express from "express";
-import { giveID, logout, signIn, refreshToken, signUp } from "../controllers/user";
-import {auth, authRefreshToken } from "../middlewares/auth";
+import {
+  giveID,
+  logout,
+  signIn,
+  refreshToken,
+  signUp
+} from "../controllers/user";
+import { auth, authRefreshToken } from "../middlewares/auth";
 
 const router = express.Router();
 

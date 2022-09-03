@@ -14,14 +14,18 @@ export async function giveID(req: Request, res: Response) {
 export async function logout(req: Request, res: Response) {
   try {
     if (!req.headers.authorization || !req.headers.refreshtoken)
-      throw new Error("Unexpected error")
-    let result = await userService.blockToken(req.headers.authorization as string);
+      throw new Error("Unexpected error");
+    let result = await userService.blockToken(
+      req.headers.authorization as string
+    );
     if (!result.success) throw new Error(result.message);
     result = await userService.blockToken(req.headers.refreshtoken as string);
     if (!result.success) throw new Error(result.message);
     return res.send("Logged out successfully");
-  }catch(err){
-    return res.status(500).send("Internal server error. Message: " + (err as Error).message);
+  } catch (err) {
+    return res
+      .status(500)
+      .send("Internal server error. Message: " + (err as Error).message);
   }
 }
 
@@ -33,8 +37,16 @@ export async function signIn(req: Request, res: Response) {
     result.value.password
   );
   if (success) {
-    const accessToken = userService.generateToken({id: result.value.id}, config.secretKey, config.tokenLife);
-    const refreshToken = userService.generateToken({id: result.value.id}, config.refreshTokenSecretKey, config.refreshTokenLife);
+    const accessToken = userService.generateToken(
+      { id: result.value.id },
+      config.secretKey,
+      config.tokenLife
+    );
+    const refreshToken = userService.generateToken(
+      { id: result.value.id },
+      config.refreshTokenSecretKey,
+      config.refreshTokenLife
+    );
     return res.setHeader("accessToken", accessToken).send({ refreshToken });
   }
   return res.status(400).send(message);
@@ -53,6 +65,10 @@ export async function signUp(req: Request, res: Response) {
 
 export async function refreshToken(req: Request, res: Response) {
   const user = (req as CustomRequest).user;
-  const token = userService.generateToken({id: (user as JwtPayload).id}, config.secretKey, config.tokenLife)
+  const token = userService.generateToken(
+    { id: (user as JwtPayload).id },
+    config.secretKey,
+    config.tokenLife
+  );
   return res.setHeader("accessToken", token).send("Success");
 }

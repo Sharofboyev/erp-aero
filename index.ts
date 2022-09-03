@@ -8,8 +8,8 @@ const app = express();
 
 app.use(express.json());
 app.use("/", login);
-app.use("/file", auth, file)
+app.use("/file", auth, file);
 
 app.listen(config.appPort, () => {
-    console.log(`Listening on port ${config.appPort}...`)
-})
+  console.log(`Listening on port ${config.appPort}...`);
+});
