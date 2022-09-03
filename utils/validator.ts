@@ -25,10 +25,20 @@ export function validateUser(
 
 export function validateFileQuery(
     params: unknown
-): Result<{ id: string; password: string }> {
+): Result<{ list_size: number; page: number }> {
   const { error, value } = Joi.object({
-    list_size: Joi.number().min(1).integer().positive().max(100).default(10),
+    list_size: Joi.number().min(1).integer().positive().max(1000).default(10),
     page: Joi.number().min(1).integer().positive().default(1)
+  }).validate(params);
+  if (error) return validationError(error.details[0].message);
+  return { ok: true, value: value };
+}
+
+export function validateFile(
+    params: unknown
+): Result<{ id: string }> {
+  const { error, value } = Joi.object({
+    id: Joi.string().required()
   }).validate(params);
   if (error) return validationError(error.details[0].message);
   return { ok: true, value: value };

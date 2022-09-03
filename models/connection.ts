@@ -14,7 +14,8 @@ connection.query(
 
 connection.query(
   `CREATE TABLE IF NOT EXISTS files 
-    (id VARCHAR(64) PRIMARY KEY, name VARCHAR(256), extension VARCHAR(128), mime_type VARCHAR (256), size INTEGER, created_time DATETIME DEFAULT NOW())`
+    (pkey SERIAL PRIMARY KEY, id VARCHAR(64) UNIQUE, name VARCHAR(256), extension VARCHAR(128), mime_type VARCHAR (256), 
+    size INTEGER, created_time DATETIME DEFAULT NOW())`
 );
 
 // This line will immediatly register signal handler. Only one
