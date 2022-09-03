@@ -7,17 +7,14 @@ import {
   downloadFile,
   updateFile
 } from "../controllers/file";
-import multer from "multer";
-import fileValidator from "../middlewares/fileValidator";
-const upload = multer({ dest: "files/" });
 
 const router = express.Router();
 
-router.post("/upload", fileValidator, upload.single("file"), receiveFile);
+router.post("/upload", receiveFile);
 router.get("/list", getFiles);
 router.delete("/delete/:id", deleteFile);
 router.get("/:id", getFile);
 router.get("/download/:id", downloadFile);
-router.put("/update/:id", upload.single("file"), updateFile);
+router.put("/update/:id", updateFile);
 
 export default router;
