@@ -1,7 +1,7 @@
 import config from "../config";
 import mysql from "mysql";
 const connection = mysql.createConnection(config.dbConfig);
-connection.query(`CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, password VARCHAR(1024))`)
+connection.query(`CREATE TABLE IF NOT EXISTS users (id VARCHAR(1024), password VARCHAR(1024))`)
 connection.query(`CREATE TABLE IF NOT EXISTS tokens (token VARCHAR(2096), expiration DATETIME)`)
 
 // This line will immediatly register signal handler. Only one
@@ -14,7 +14,7 @@ process.on("exit", () => {
   connection.end();
 });
 
-export function getUser(id: Number) {
+export function getUser(id: string) {
   return new Promise((resolve, reject) => {
     connection.query(
       "SELECT * FROM users WHERE id = ?",
@@ -28,11 +28,11 @@ export function getUser(id: Number) {
   });
 }
 
-export function insertUser(password: string) {
+export function insertUser(id: string, password: string) {
   return new Promise((resolve, reject) => {
     connection.query(
-      "INSERT INTO users (password) VALUES (?) ",
-      [password],
+      "INSERT INTO users (id, password) VALUES (?, ?) ",
+      [id, password],
       (error, results) => {
         if (error) return reject(error);
         return resolve(results.insertId);

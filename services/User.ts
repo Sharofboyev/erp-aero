@@ -15,7 +15,7 @@ type UserSchema = {
 
 class User {
   async signIn(
-    id: Number,
+    id: string,
     password: string
   ): Promise<{ success: boolean; message?: string }> {
     try {
@@ -28,29 +28,27 @@ class User {
     }
   }
 
-  async logOut() {}
-  async refreshToken() {}
-  async signUp(password: string) {
+  async signUp(id: string, password: string) {
     try {
       let hash = bcrypt.hashSync(password, 10);
-      let userId = await insertUser(hash);
-      let accessToken = jwt.sign({ id: userId }, config.secretKey, {
+      await insertUser(id, hash);
+      let accessToken = jwt.sign({ id }, config.secretKey, {
         expiresIn: config.tokenLife
       });
-      let refreshToken = jwt.sign({id: userId}, config.refreshTokenSecretKey, {
+      let refreshToken = jwt.sign({ id }, config.refreshTokenSecretKey, {
         expiresIn: config.refreshTokenLife
       });
-      return { success: true, data: { userId, refreshToken, accessToken } };
+      return { success: true, data: { refreshToken, accessToken } };
     } catch (err) {
       return { success: false, message: (err as Error).message };
     }
   }
 
-  generateToken(data: any, secretKey: string, expiresIn: number){
+  generateToken(data: any, secretKey: string, expiresIn: number) {
     let accessToken = jwt.sign(data, secretKey, {
-        expiresIn: expiresIn
+      expiresIn: expiresIn
     });
-    return accessToken
+    return accessToken;
   }
 
   async blockToken(token: string) {

@@ -5,7 +5,7 @@ import {auth, authRefreshToken } from "../middlewares/auth";
 const router = express.Router();
 
 router.get("/info", auth, giveID); //done
-router.get("/logout", auth, logout);
+router.get("/logout", auth, authRefreshToken, logout);
 router.post("/signin", signIn); //done
 router.post("/signin/new_token", authRefreshToken, refreshToken); //done
 router.post("/signup", signUp); //done

@@ -40,6 +40,6 @@ export async function authRefreshToken(req: Request, res: Response, next: NextFu
       (req as CustomRequest).user = user;
     return next();
   } catch (err) {
-    return res.status(401).send(`Unauthorized. ${(err as Error).message}`);
+    return res.status(401).send(`Unauthorized. Refresh token error: ${(err as Error).message}`);
   }
 }
