@@ -15,7 +15,7 @@ export async function receiveFile(req: Request, res: Response) {
         .send(
           "Received wrong field name: " +
             err.field +
-            '.\n\nWaiting for "file" field'
+            '.\n\nExpected "file" field'
         );
     } else if (err) {
       return res.status(500).send("Internal server error");
@@ -89,7 +89,7 @@ export async function updateFile(req: Request, res: Response) {
         .send(
           "Received wrong field name: " +
             err.field +
-            '.\n\nWaiting for "file" field'
+            '.\n\nExpected "file" field'
         );
     } else if (err) {
       return res.status(500).send("Internal server error");

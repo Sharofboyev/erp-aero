@@ -57,13 +57,15 @@ export default class FileHandler {
   async updateFile(file: CustomFile, id: string) {
     try {
       await new Promise((resolve, reject) => {
-        fs.unlink(`files/${id}`, (err) => {
-          if (err) reject(err);
-          fs.rename(`files/${file.filename}`, `files/${id}`, (err) => {
+        if (fs.existsSync(`files/${id}`)){
+          fs.unlink(`files/${id}`, (err) => {
             if (err) reject(err);
-            resolve(true);
+            fs.rename(`files/${file.filename}`, `files/${id}`, (err) => {
+              if (err) reject(err);
+              resolve(true);
+            });
           });
-        });
+        }
       });
 
       const originalName = file.originalname.split(".");
