@@ -6,7 +6,7 @@ import {
   getUser,
   insertUser,
   validateToken
-} from "../models/user.db";
+} from "../models/user";
 
 type UserSchema = {
   id: number;
