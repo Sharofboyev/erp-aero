@@ -1,23 +1,4 @@
-import config from "../config";
-import mysql from "mysql";
-const connection = mysql.createConnection(config.dbConfig);
-connection.query(
-  `CREATE TABLE IF NOT EXISTS users 
-    (pkey SERIAL PRIMARY KEY, id VARCHAR(1024), password VARCHAR(1024), created_time DATETIME DEFAULT NOW());`
-);
-connection.query(
-  `CREATE TABLE IF NOT EXISTS tokens (token VARCHAR(2096), expiration DATETIME)`
-);
-
-// This line will immediatly register signal handler. Only one
-//connection will serve to the app. Whenever app terminates, connection will be closed.
-process.on("SIGINT", () => {
-  process.exit();
-});
-
-process.on("exit", () => {
-  connection.end();
-});
+import connection from "./connection";
 
 export function getUser(id: string) {
   return new Promise((resolve, reject) => {
