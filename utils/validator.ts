@@ -9,7 +9,7 @@ const validationError: <T>(message: string) => Result<T> = (message) => ({
 
 export function validateUser(
   body: unknown
-): Result<{ id: string; password: string }> {
+): Result<{ id: string, password: string }> {
   const { error, value } = Joi.object({
     id: Joi.alternatives(
       Joi.string().email().required().max(128),
@@ -25,7 +25,7 @@ export function validateUser(
 
 export function validateFileQuery(
   params: unknown
-): Result<{ list_size: number; page: number }> {
+): Result<{ list_size: number, page: number }> {
   const { error, value } = Joi.object({
     list_size: Joi.number().min(1).integer().positive().max(1000).default(10),
     page: Joi.number().min(1).integer().positive().default(1)
@@ -41,3 +41,13 @@ export function validateFile(params: unknown): Result<{ id: string }> {
   if (error) return validationError(error.details[0].message);
   return { ok: true, value: value };
 }
+
+export function validateRefreshToken(
+    body: unknown
+  ): Result<{ refreshToken: string }> {
+    const { error, value } = Joi.object({
+      refreshToken: Joi.string().min(5).required()
+    }).validate(body);
+    if (error) return validationError(error.details[0].message);
+    return { ok: true, value: value };
+  }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CustomRequest } from "../middlewares/auth";
 import { JwtPayload } from "jsonwebtoken";
-import { validateUser } from "../utils/validator";
+import { validateRefreshToken, validateUser } from "../utils/validator";
 import User from "../services/User";
 import config from "../config";
 let userService = new User();
@@ -43,7 +43,7 @@ export async function signIn(req: Request, res: Response) {
       config.tokenLife
     );
     const refreshToken = userService.generateToken(
-      { id: result.value.id },
+      {id: result.value.id},
       config.refreshTokenSecretKey,
       config.refreshTokenLife
     );
@@ -64,9 +64,14 @@ export async function signUp(req: Request, res: Response) {
 }
 
 export async function refreshToken(req: Request, res: Response) {
-  const user = (req as CustomRequest).user;
+  const result = validateRefreshToken(req.body);
+  if (!result.ok) return res.status(400).send(result.message);
+
+  const {success, message, id} = await userService.refreshToken(result.value.refreshToken);
+  if (!success) return res.status(400).send(message);
+
   const token = userService.generateToken(
-    { id: (user as JwtPayload).id },
+    {id},
     config.secretKey,
     config.tokenLife
   );

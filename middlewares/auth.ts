@@ -5,7 +5,8 @@ import User from "../services/User";
 const userInstance = new User();
 
 export interface CustomRequest extends Request {
-  user: string | JwtPayload;
+  user: string | JwtPayload,
+  refreshExpire?: number 
 }
 
 export async function auth(req: Request, res: Response, next: NextFunction) {
@@ -22,28 +23,5 @@ export async function auth(req: Request, res: Response, next: NextFunction) {
     return next();
   } catch (err) {
     return res.status(401).send(`Unauthorized. ${(err as Error).message}`);
-  }
-}
-
-export async function authRefreshToken(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  let token = req.headers.refreshtoken;
-  try {
-    if (!token) throw new Error("Token not provided");
-    token = String(token);
-    let user = jwt.verify(token, config.refreshTokenSecretKey);
-    let blocked = !(await userInstance.checkToken(token));
-    if (blocked) {
-      throw new Error("Invalid token");
-    }
-    if (user) (req as CustomRequest).user = user;
-    return next();
-  } catch (err) {
-    return res
-      .status(401)
-      .send(`Unauthorized. Refresh token error: ${(err as Error).message}`);
   }
 }

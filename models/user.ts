@@ -30,7 +30,7 @@ export function insertUser(id: string, password: string) {
 export function addToken(token: string): Promise<void | string> {
   return new Promise((resolve, reject) => {
     connection.query(
-      "INSERT INTO tokens (token) VALUES (?)",
+      "INSERT INTO tokens (token, expiration) VALUES (?, ?)",
       [token],
       (error, result) => {
         if (error) {

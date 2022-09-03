@@ -68,6 +68,18 @@ class User {
       return false;
     }
   }
+
+  async refreshToken(token: string) {
+    try {
+      let user = jwt.verify(token, config.refreshTokenSecretKey);
+      return {success: true, id: (user as {id: string}).id};
+    } catch (err) {
+      return {
+        success: false,
+        message: `Unauthorized. Refresh token error: ${(err as Error).message}`
+      };
+    }
+  }
 }
 
 export default User;
